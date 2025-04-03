@@ -97,22 +97,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: 🔍 Get Load Balancer DNS
-        id: get-lb
-        run: |
-          ECS_SERVICE_DESC=$(aws ecs describe-services \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --services ${{ env.ECS_SERVICE }})
-
-          LOAD_BALANCER_NAME=$(echo "$ECS_SERVICE_DESC" | jq -r '.services[0].loadBalancers[0].loadBalancerName')
-
-          ALB_DESC=$(aws elbv2 describe-load-balancers \
-            --names "$LOAD_BALANCER_NAME")
-
-          ALB_DNS=$(echo "$ALB_DESC" | jq -r '.LoadBalancers[0].DNSName')
-
-          echo "alb_dns=$ALB_DNS" >> $GITHUB_OUTPUT
-
       - name: 🕷️ Run ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.12.0
         with:
